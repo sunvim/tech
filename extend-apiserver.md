@@ -43,17 +43,17 @@ spec:
 
   groups:
 
-  \- system:authenticated
+  - system:authenticated
 
   request: 步骤2中的csr中内容
 
   usages:
 
-  \- digital signature
+  - digital signature
 
-  \- key encipherment
+  - key encipherment
 
-  \- server auth
+  - server auth
 ```
 
 7、授权csr-webhook
