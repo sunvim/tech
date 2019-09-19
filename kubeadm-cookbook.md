@@ -9,6 +9,7 @@ reboot system
 
 ## step 2：安装docker/kubeadm/kubelet
 
+```bash
 apt-get update && apt-get install -y apt-transport-https curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
@@ -17,9 +18,11 @@ EOF
 apt-get update
 apt-get install -y docker.io kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
+```
 
 ## step 3: 设置docker为systemd
 
+```bash
 vi /etc/docker/daemon.json
 
 {
@@ -27,24 +30,34 @@ vi /etc/docker/daemon.json
 }
 systemctl daemon-reload 
 systemctl restart docker
-
-sudo systemctl enable docker
+systemctl enable docker
+```
 
 ## step 4: 初始化系统
 
+```bash
 kubeadm init --pod-network-cidr 10.244.0.0/16 --apiserver-advertise-address master主机地址 --kubernetes-version 1.15.2
+```
 
 ## step 5: 安装pod网络插件
 
+```bash
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+```
 
 ## step 6: 设置节点名称
 
+```bash
 kubectl label nodes 节点名称 node-role.kubernetes.io/worker=worker
+```
 
 ## step 7: 测试集群
 
+```bash
 kubectl run  tmp  --rm --image=alpine:3.10.1 --namespace="default" --restart=Never  -it /bin/sh
+```
+
+
 
 
 
