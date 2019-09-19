@@ -1,11 +1,17 @@
 # 利用kubeadm安装K8S集群
 
+**环境说明**
+
+OS： ubuntu 18.04
+
 ## step1：配置宿主机环境
 
-Edit the /etc/default/grub file.
+```bash
+vi /etc/default/grub 
 GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
-sudo update-grub
-reboot system
+update-grub
+reboot
+```
 
 ## step 2：安装docker/kubeadm/kubelet
 
