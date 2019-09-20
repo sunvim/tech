@@ -23,6 +23,12 @@ kubectl create serviceaccount --namespace kube-system tiller
 kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 ```
 
+初始化helm
+
+```bas
+helm init
+```
+
 为应用程序设置`serviceAccount`：
 
 ```bash
