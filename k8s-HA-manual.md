@@ -96,8 +96,13 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub root@master03
 **master01 install keepalive:**
 
 ```bash
+#centos
 yum -y install epel-re*
 yum -y install keepalived.x86_64 
+#ubuntu
+apt install -y libssl-dev  openssl libpopt-dev
+apt install -y keepalived
+#配置keepalived
 cat > /etc/keepalived/keepalived.conf <<-'EOF'
 ! Configuration File for keepalived
 
@@ -126,7 +131,11 @@ systemctl enable keepalived.service && systemctl start keepalived.service
 **master01 install HAproxy:**
 
 ```bash
+#centos
 yum -y install haproxy.x86_64
+#ubuntu
+apt install -y haproxy
+
 cat > /etc/haproxy/haproxy.cfg <<-'EOF'
 global
         chroot  /var/lib/haproxy
