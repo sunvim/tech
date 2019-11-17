@@ -26,6 +26,7 @@ kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admi
 初始化helm
 
 ```bas
+# 国内用户下载gcr.io镜像 可替换成gcr.azk8s.cn对应的域名
 helm init
 # k8s 1.15 +
 helm init --service-account tiller --output yaml | sed 's@apiVersion: extensions/v1beta1@apiVersion: apps/v1@' | sed 's@  replicas: 1@  replicas: 1\n  selector: {"matchLabels": {"app": "helm", "name": "tiller"}}@' | kubectl apply -f -
