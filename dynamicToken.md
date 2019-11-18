@@ -27,5 +27,21 @@ vault write database/roles/my-role \
 
 
 
+## step 4: 获取动态密钥
+
+```bash
+vault read database/creds/my-role
+
+Key                Value
+---                -----
+lease_id           database/creds/my-role/Eg41dRiK0T2Dvyiec3gauUcN
+lease_duration     5m
+lease_renewable    true
+password           A1a-1gbNJlcla4Mnt9mn
+username           v-token-my-role-7QasxOTHGDWiAgNv
+```
+
+
+
 
 
