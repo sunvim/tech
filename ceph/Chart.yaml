@@ -1,0 +1,16 @@
+#! ANKR_RELEASE_STATUS=DISABLE
+apiVersion: v1
+name: ceph
+version: 0.0.1
+appVersion: 0.0.1
+description: Build a Faster, Cheaper, Securer cloud using idle processing power in data centers and edge devices
+keywords:
+- kubernetes
+home: https://www.ankr.com/
+icon: https://www.ankr.com/favicon/favicon-32x32.png
+sources:
+- https://github.com/Ankr-network/dccn-daemon
+maintainers:
+- name: mobius
+  email: mobius@ankr.com
+engine: gotpl
