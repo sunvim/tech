@@ -1,0 +1,188 @@
+23.106.36.115 ceph-admin01
+23.106.33.185 ceph-admin02
+23.106.36.110 ceph-mon01
+23.106.36.112 ceph-mon02
+23.106.36.107 ceph-mon03
+23.106.36.116 ceph-mon04
+23.106.36.113 ceph-rgw01
+23.106.36.111 ceph-rgw02
+23.106.33.90  ceph-osd01
+23.106.33.88  ceph-osd02
+
+
+--------------------------------
+
+23.106.36.115 ceph-admin
+23.106.36.110 ceph-mon01
+23.106.36.112 ceph-mon02
+23.106.36.107 ceph-mon03
+23.106.36.116 ceph-mon04
+23.106.36.113 ceph-rgw01
+23.106.36.111 ceph-rgw02
+
+test
+-----------------------------
+
+10.51.24.208 
+10.51.24.207 
+10.51.24.209 
+10.51.24.214 
+10.51.24.215 
+10.51.24.213 
+10.51.24.212 
+10.51.24.211 
+
+
+---
+
+echo deb https://download.ceph.com/debian-Hammer/$(lsb_release -sc) main | tee /etc/apt/sources.list.d/ceph.list
+
+10.51.24.208 	ceph-admin
+10.51.24.207 	ceph-rgw
+10.51.24.209 	ceph-mon01
+10.51.24.214 	ceph-mon02
+10.51.24.215 	ceph-mon03
+10.51.24.213 	ceph-osd01
+10.51.24.212 	ceph-osd02
+10.51.24.211	ceph-osd03
+
+----
+
+Host ceph-osd01
+Hostname ceph-osd01
+User ceph-admin
+Host ceph-osd02
+Hostname ceph-osd02
+User ceph-admin
+Host ceph-osd03
+Hostname ceph-osd03
+User ceph-admin
+Host ceph-mon01
+Hostname ceph-mon01
+User ceph-admin
+Host ceph-mon02
+Hostname ceph-mon02
+User ceph-admin
+Host ceph-mon03
+Hostname ceph-mon03
+User ceph-admin
+Host ceph-rgw
+Hostname ceph-rgw
+User ceph-admin
+----
+
+
+
+for i in ceph-rgw ceph-mon01 ceph-mon02 ceph-mon03 ceph-osd01 oceph-sd02 ceph-osd03; do
+
+ssh-copy-id $i
+
+done
+
+---
+
+ceph-deploy new ceph-mon01 ceph-mon02 ceph-mon03
+
+----
+ceph-deploy install ceph-mon01 ceph-mon02 ceph-mon03 ceph-osd01 ceph-osd02 ceph-rgw01 ceph-rgw02
+
+-----
+3、部署初始监视器并收集密钥：
+
+ceph-deploy mon create-initial
+
+---------------------
+4、将ceph配置文件和密钥环复制到节点,将配置文件和管理密钥复制到你的管理节点和Ceph节点：
+ceph-deploy admin ceph-osd01 ceph-osd02 
+
+------------------
+5、部署管理器守护程序,通过运行以下命令部署管理器守护程序
+ceph-deploy mgr create ceph-osd01
+
+6.deploy osd01 data node
+create osd01 log path
+mkdir -p /logods/{sdc,sdd,sde,sdf,sdg,sdh,sdi,sdj,sdk,sdl,sdm,sdn,sdo,sdp,sdq,sdr,sds,sdt,sdu,sdv,sdw,sdx,sdy,sdz}
+
+for i in sdc sdd sde sdf sdg sdh sdi sdj sdk sdl sdm sdn sdo sdp sdq sdr sds sdt sdu sdv sdw sdx sdy sdz ; do 
+   parted /dev/$i mklabel gpt mkpart $i xfs 1 8T
+done
+
+for i in sdc1 sdd1 sde1 sdf1 sdg1 sdh1 sdi1 sdj1 sdk1 sdl1 sdm1 sdn1 sdo1 sdp1 sdq1 sdr1 sds1 sdt1 sdu1 sdv1 sdw1 sdx1 sdy1 sdz1 ; do 
+   echo "format $i"
+   mkfs.xfs /dev/$i
+   echo "format $i over."
+done
+
+for i in sdc sdd sde sdf sdg sdh sdi sdj sdk sdl sdm sdn sdo sdp sdq sdr sds sdt sdu sdv sdw sdx sdy sdz ; do 
+   echo "ceph-deploy osd create $i"
+   ceph-deploy osd create --data /dev/$i --journal /logods/$i ceph-osd01
+   echo "osd create over."
+done
+
+ceph-osd02
+
+mkdir -p /logods/{sdc1,sdd1,sde1,sdf1,sdg1,sdh1,sdi1,sdj1,sdk1,sdl1,sdm1,sdn1,sdo1,sdp1,sdq1,sdr1,sds1,sdt1,sdu1,sdv1,sdw1,sdx1,sdy1}
+
+for i in sdc1 sdd1 sde1 sdf1 sdg1 sdh1 sdi1 sdj1 sdk1 sdl1 sdm1 sdn1 sdo1 sdp1 sdq1 sdr1 sds1 sdt1 sdu1 sdv1 sdw1 sdx1 sdy1 ; do 
+   echo "ceph-deploy osd create $i"
+   ceph-deploy osd create --data /dev/$i --journal /logods/$i ceph-osd02
+   echo "osd create over."
+done
+
+
+7.create data node
+
+
+
+8. crate storage pool
+
+ceph osd pool create {pool-name} {pg-num} [{pgp-num}] [replicated] [crush-ruleset-name] [expected-num-objects]
+
+ceph osd pool create ankr 4096 4096 replicated 
+
+ceph osd pool create ankr 2048 2048
+
+ceph osd pool set-quota ankr max_objects 40960
+
+ceph osd pool rm ankr ankr --yes-i-really-really-mean-it
+
+query storage pool quota
+
+ceph osd pool get-quota ankr
+
+9. 压测
+
+rados bench -p ankr 30 write -b 4M --no-cleanup
+rados bench -p ankr 30 seq 
+rados bench -p ankr 30 rand 
+
+
+
+
+
+
+
+
+
+
+----
+重置Ceph Cluster
+ 
+ceph-deploy purge ceph-mon01 ceph-mon02 ceph-mon03 ceph-osd01 ceph-osd02 ceph-rgw01 ceph-rgw02
+ceph-deploy purgedata ceph-mon01 ceph-mon02 ceph-mon03 ceph-osd01 ceph-osd02  ceph-rgw01 ceph-rgw02
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,5 @@
+1. go mod init xxx
+
+2. kubebuilder create api --group ankr.com --version v1 --kind AssistScheduler
+
+3. kubebuilder create webhook --group ankr.com --version v1 --kind AssistScheduler --defaulting

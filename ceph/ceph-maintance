@@ -1,0 +1,60 @@
+重启服务
+systemctl stop ceph-osd\*.service ceph-osd.target
+
+sudo systemctl status ceph\*.service ceph\*.target
+
+systemctl daemon-reload && systemctl restart ceph-osd\*.service ceph-osd.target
+
+修复存储池
+ application not enabled on 1 pool(s)
+ 
+ ceph health detail
+ 
+ Hi  Sir/Madam
+
+   I'm sorry to tell you many of the new batch machine have the same issue of reinstall,  please help check this full system.
+
+  for now I met three server , their server id are:
+
+  10926244, 10926245, 54505
+
+ hope no issue of reinstall, thanks!  
+
+设置默认
+kubectl patch storageclass mix -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+删除存储池
+ceph tell mon.\* injectargs '--mon-allow-pool-delete=true'
+ceph osd pool delete hot-storage hot-storage --yes-i-really-really-mean-it
+ceph osd pool delete cold-storage cold-storage --yes-i-really-really-mean-it
+ceph tell mon.\* injectargs '--mon-allow-pool-delete=false'
+
+吞吐量:
+
+随机写
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=randwrite -ioengine=libaio -bs=4m -size=4G -numjobs=8  -group_reporting=1
+随机读
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=randread -ioengine=libaio -bs=4m -size=4G -numjobs=8  -group_reporting=1
+
+顺序写
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=write -ioengine=libaio -bs=4m -size=4G -numjobs=1  -group_reporting=1
+
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=write -ioengine=libaio -bs=4m -size=4G -numjobs=8  -group_reporting=1
+
+顺序读
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=read -ioengine=libaio -bs=4m -size=4G -numjobs=1  -group_reporting=1
+
+IOPS:
+随机写
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=randwrite -ioengine=libaio -bs=16k -size=4G -numjobs=8  -group_reporting=1
+随机读
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=randread -ioengine=libaio -bs=16k -size=4G -numjobs=8  -group_reporting=1
+
+顺序写
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=write -ioengine=libaio -bs=16k -size=4G -numjobs=1  -group_reporting=1
+
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=write -ioengine=libaio -bs=16k -size=4G -numjobs=8  -group_reporting=1
+
+顺序读
+fio -name=/ceph-vol/tmpfile -direct=1 -iodepth=32 -rw=read -ioengine=libaio -bs=16k -size=4G -numjobs=1  -group_reporting=1
+

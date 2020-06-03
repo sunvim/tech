@@ -1,0 +1,88 @@
+一 ovs 配合libvirtd使用
+   1.建立一个网桥
+   ovs-vsctl add-br ovsbr
+   2.修改kvm虚拟机的xml配置文件如下:
+       <interface type='bridge'>
+         <mac address='18:9e:b4:ad:a1:0e'/>
+         <source bridge='ovsbr'/>
+         <virtualport type='openvswitch'/>
+         <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>
+       </interface>
+
+
+二.Qos的速度限制
+   1.设置接口tap0的进入网络速度为10mb/s
+   ovs-vsctl set interface tap0 ingress_policing_rate=1000
+   ovs-vsctl set interface tap0 ingress_policing_burst=100
+   //参数说明
+   ingress_policing_rate
+       the maximum rate (in Kbps) that this VM should be allowed to send
+   ingress_policing_burst
+       a parameter to the policing algorithm to indicate the maximum amount of data (in Kb) that this interface can send beyond the policing rate.
+
+
+三.使用vlan进行网络隔离，从而使虚机有不同的网络
+   1.新建一个网桥
+   ovs-vsctl add-br ovsbr
+   
+   2.在物理机添加valn号为20的vlan
+   ovs-vsctl add-port ovsbr vlan20 tag=20 -- set interface vlan20 type=internal
+   ifconfig vlan20 192.168.20.1 netmask 255.255.255.0
+   
+   在物理机添加valn号为10的vlan
+   ovs-vsctl add-port ovsbr vlan10 tag=10 -- set interface vlan10 type=internal
+   ifconfig vlan10 192.168.10.1 netmask 255.255.255.0
+   
+   3.在虚拟机上绑定IP
+   host1:
+   
+   ip link add link eth0 name eth0.10 type vlan id 10
+   ifconfig eth0.10 192.168.10.33 netmask 255.255.255.0 broadcast 192.168.10.255 up
+   route add default gw 192.168.10.1 dev eth0.10
+   
+   host2:
+   ip link add link eth0 name eth0.20 type vlan id 20
+   ifconfig eth0.20 192.168.20.33 netmask 255.255.255.0 broadcast 192.168.20.255 up
+   route add default gw 192.168.20.1 dev eth0.20
+   
+   4.测试不同的vlan是网络是不通
+
+
+三.使用隧道连接其它的主机
+  在主机1上
+  1.建立一个网桥
+    ovs-vsctl add-br br0 
+	
+  2.把虚拟机网口加入到网桥上
+    ovs-vsctl add-port br0 tap0
+
+  3.创建一个隧道
+    ovs-vsctl add-port br0 vxlan1 \
+    -- set interface vxlan1 type=vxlan options:remote_ip=另外物理机的出口ip
+	
+  4.在主机2上做同样的操作
+   
+  5.验证主机1上的虚拟机和主机2上的虚拟机网络的连通。
+
+
+四.限制出口网速
+  1.清除网桥上的flows规则
+      ovs-ofctl del-flows ovsbr
+  2.清除port上的qos规则
+      ovs-vsctl clear port vnet0 qos
+  3清除所有qos，和queue表(一般不要操作)
+      #ovs-vsctl list qos|grep _uuid|awk '{print $3}' |xargs -I {} ovs-vsctl destroy qos {}
+      #ovs-vsctl list queue|grep _uuid|awk '{print $3}' |xargs -I {} ovs-vsctl destroy queue {}
+  4.建立qos规则，并加入两条queue限速100mbs
+  ovs-vsctl -- \
+    set port vnet0 qos=@newqos -- \
+    --id=@newqos create qos type=linux-htb \
+        other-config:max-rate=100000000 \
+        queues:345=@vnet0queue \
+        queues:678=@vnet1queue -- \
+    --id=@vnet0queue create queue other-config:max-rate=100000000 -- \
+    --id=@vnet1queue create queue other-config:max-rate=100000000
+  5.设置网桥的flow规则
+  ovs-ofctl add-flow ovsbr priority=0,actions=set_queue:345,normal
+  #ovs-ofctl add-flow ovsbr priority=0,actions=normal
+  #ovs-ofctl dump-flows ovsbr
