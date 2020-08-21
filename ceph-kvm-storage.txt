@@ -1,0 +1,14 @@
+使用 Ceph 作为 QEMU KVM 虚拟机的存储
+
+Ceph RBD 块设备存储是十分适合作为虚拟化平台的存储后端的, 这也是其最常用的情景之一. 这篇主要介绍如何将 Ceph RBD 作为 QEMU 等的存储端.
+
+RBD 具有快照的特性, 我们又可以对 RBD 快照进行克隆, 创建一系列的写时复制克隆复本. RBD 的这一特性可以让 Ceph 能够很快地给虚拟机提供块设备, 因为客户端不需要每次在新建虚拟机时都下载整个镜像.
+
+libvirt 为 OpenStack, CloudStack 等云计算平台提供 Ceph 块设备服务, 云计算平台使用 libvirt 与 QEMU/KVM 等交互, QEMU/KVM 等使用 librbd 与 Ceph RBD 块设备交互.
+
+Ceph RBD 可以作为 VMs 的数据盘和系统盘来使用. 下面我们就来看看如何实现这一目标.
+
+配置 Ceph
+要配置 Ceph 来配合 libvirt, 可依照如下步骤.
+
+创建一个 Pool. 专门为 libvirt 创建一个 Pool, 并初始化.

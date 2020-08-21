@@ -1,24 +1,31 @@
 重启服务
-systemctl stop ceph-osd\*.service ceph-osd.target
+systemctl start ceph-osd\*.service ceph-osd.target
 
-sudo systemctl status ceph\*.service ceph\*.target
+sudo systemctl status ceph-osd\*.service ceph\*.target
+
+sudo systemctl restart ceph-osd\*.service ceph\*.target
+
+systemctl status ceph-osd\*.service
 
 systemctl daemon-reload && systemctl restart ceph-osd\*.service ceph-osd.target
+
+systemctl status ceph-osd@20.service
+
+systemctl start ceph-osd@21.service
+systemctl start ceph-osd@22.service
+systemctl start ceph-osd@23.service
+systemctl start ceph-osd@24.service
+systemctl start ceph-osd@27.service
+
+for i in 1 4 6; do
+systemctl start ceph-osd@$i.service
+done
+
 
 修复存储池
  application not enabled on 1 pool(s)
  
  ceph health detail
- 
- Hi  Sir/Madam
-
-   I'm sorry to tell you many of the new batch machine have the same issue of reinstall,  please help check this full system.
-
-  for now I met three server , their server id are:
-
-  10926244, 10926245, 54505
-
- hope no issue of reinstall, thanks!  
 
 设置默认
 kubectl patch storageclass mix -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'

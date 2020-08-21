@@ -82,6 +82,8 @@ ceph-deploy mon create-initial
 
 11.将ceph配置文件和密钥环复制到节点
 ceph-deploy admin ceph-osd01 ceph-osd02 ceph-osd03 ceph-osd04
+// push config to osd node
+// ceph-deploy --overwrite-conf config push ceph-osd01 ceph-osd02 ceph-osd03 ceph-osd04
 
 12.部署管理器守护程序
 ceph-deploy mgr create ceph-osd03
@@ -89,7 +91,7 @@ ceph-deploy mgr create ceph-osd03
 13.添加OSD
 ceph-osd03
 ---------
-for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do 
+for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do
    echo "ceph-deploy osd create $i"
    ceph-deploy osd create --bluestore --data /dev/$i ceph-osd03
    echo "osd create over."
@@ -97,7 +99,7 @@ done
 
 ceph-osd04
 ---------
-for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do 
+for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do
    echo "ceph-deploy osd create $i"
    ceph-deploy osd create --bluestore --data /dev/$i ceph-osd04
    echo "osd create over."
@@ -105,7 +107,7 @@ done
 
 ceph-osd01
 ---------
-for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do 
+for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do
    echo "ceph-deploy osd create $i"
    ceph-deploy osd create --data /dev/$i ceph-osd01
    echo "osd create over."
@@ -113,7 +115,7 @@ done
 
 ceph-osd02
 ---------
-for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do 
+for i in sdb sdc sdd sde sdf sdg sdh sdi sdj sdk ; do
    echo "ceph-deploy osd create $i"
    ceph-deploy osd create --data /dev/$i ceph-osd02
    echo "osd create over."
@@ -165,13 +167,13 @@ ceph osd pool set hot-storage cache_min_evict_age 1800
 17. 压测
 
 rados bench -p hot-storage 15 -t 8 write  --no-cleanup
-rados bench -p hot-storage 15 -t 8 seq 
-rados bench -p hot-storage 15 -t 8 rand 
+rados bench -p hot-storage 15 -t 8 seq
+rados bench -p hot-storage 15 -t 8 rand
 rados -p hot-storage cleanup
 
 rados bench -p cold-storage 15 -t 8 write --no-cleanup
-rados bench -p cold-storage 15 -t 8 seq 
-rados bench -p cold-storage 15 -t 8 rand 
+rados bench -p cold-storage 15 -t 8 seq
+rados bench -p cold-storage 15 -t 8 rand
 rados -p cold-storage cleanup
 
 ceph osd pool create ankr-backup 512 512 replicated rule-hdd 409600

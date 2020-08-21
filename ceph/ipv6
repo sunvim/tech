@@ -1,0 +1,14 @@
+IPV6INIT=yes 
+IPV6_AUTOCONF=no
+IPV6_DEFROUTE=yes 
+IPV6_FAILURE_FATAL=no
+IPV6ADDR=2402:a7c0:8100:a005:25::1/64
+IPV6_DEFAULTGW=2402:a7c0:8100:a005::1
+
+
+sysctl -w net.ipv6.conf.all.disable_ipv6=0
+
+/etc/sysconfig/network-scripts
+
+centos 8
+nmtui

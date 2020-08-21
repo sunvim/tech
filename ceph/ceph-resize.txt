@@ -1,0 +1,28 @@
+a. 根据pvc找到pv,according to pv to find imageName ,memo pool and imageName
+b. 登录到ceph集群 查看imageName信息， rbd info slow/xxxxx
+c. 扩容 rbd resize --size 1000000 slow/csi-vol-40d7382d-cb67-11ea-a248-6a58af5e63d4
+d. 找到容器所在的宿主机且找到rbd编号： kubectl -n xxx exec -it xxxx -- df -h 找出对应rbd编号
+e. 更行容量信息：
+    blockdev --getsize64 /dev/rbd38
+    xfs_growfs /dev/rbd38  # xfs
+f. 更新pv的信息 capacity size 修改成指定size的容量
+kubectl edit pv xxxxx  
+
+
+mysql -hdb.ankr.com -uroot -P4000 -p@Ankr1234
+
+10.28.5.236/27
+
+--resolv-conf=/etc/resolv.conf
+23.106.248.137 x
+23.106.248.138 x
+23.106.248.139
+23.106.248.140
+23.106.248.141
+23.106.248.142 
+23.106.248.143
+23.106.248.144
+23.106.248.145
+23.106.248.184
+
+curl -i -x 23.106.248.184:80  -XPOST http://gauge.cls-593f3f46-316e-4f00-8ebd-9a45cfde390d.ankr.com/gauge/v2/detail -d '{"record_time":"2020072020","records_per_page":10,"page_no":1}'

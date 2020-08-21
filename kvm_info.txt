@@ -1,0 +1,10 @@
+ 1. download ubuntu netboot mini.iso
+ 
+ wget http://archive.ubuntu.com/ubuntu/dists/focal/main/installer-amd64/current/legacy-images/netboot/mini.iso
+ 
+ 2. create kvm image
+ 
+ virt-install --virt-type kvm --name ubuntu --ram 1024 --cdrom=/home/mobius/img/ubuntu/mini.iso --disk /home/mobius/img/ubuntu/os.img,bus=virtio,size=4,format=qcow2 --network network=default --graphics vnc,listen=0.0.0.0 --noautoconsole --os-type=linux --os-variant=ubuntu20.04
+ 
+  
+  virt-install --virt-type kvm --name ubuntu --ram 2048 --cdrom=/var/lib/libvirt/images/base.img --disk /var/lib/libvirt/images/testapp.img,bus=virtio,size=20,format=qcow2 --network network=default --graphics vnc,listen=0.0.0.0 --noautoconsole --os-type=linux --os-variant=ubuntu18.04
